@@ -21,7 +21,7 @@ zinit light Aloxaf/fzf-tab
 # export EDITOR="emacsclient -c -a 'emacs' --frame-parameters='(quote (name . \"float\"))'"
 export EDITOR="nvim"
 export TERM="xterm-kitty"
-export PATH=$PATH:/usr/sbin:/snap/bin:~/bin
+export PATH=$PATH:/usr/sbin:/snap/bin:~/bin:~/.local/bin
 
 # История
 HISTFILE=~/.history

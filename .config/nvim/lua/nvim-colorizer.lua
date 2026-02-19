@@ -2,7 +2,7 @@ return {
     'roobert/tailwindcss-colorizer-cmp.nvim',
     {
         'NvChad/nvim-colorizer.lua',
-        -- dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
         config = function()
             local nvchadcolorizer = require('colorizer')
             local tailwindcolorizer = require('tailwindcss-colorizer-cmp')

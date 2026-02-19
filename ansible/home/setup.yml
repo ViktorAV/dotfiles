@@ -1,0 +1,181 @@
+- name: Настройка локальной Archlinux системы
+  hosts: local
+  become: yes
+
+  tasks:
+    - name: Обновление Archlinux
+      community.general.pacman:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Установка необходимых пакетов
+      community.general.pacman:
+        name: 
+          - base-devel
+          - linux
+          - linux-headers
+          - git
+          - sudo
+          - curl
+          - wget
+        state: present
+
+    - name: Установка nvidia, основные драйвера и поддержка 32-битных приложений
+      community.general.pacman:
+        name:
+          - nvidia
+          - nvidia-utils
+          - lib32-nvidia-utils
+          - nvidia-settings
+        state: present
+
+    - name: Установка intel-ucode, обновления микрокода для стабильности CPU
+      community.general.pacman:
+        name: intel-ucode
+        state: present
+
+    - name: Окружение hyprland
+      block:
+        - name: Установка бэкенд портала рабочего стола для Hyprland
+          community.general.pacman:
+            name: xdg-desktop-portal-hyprland
+            state: present
+        - name: Установка панели состояния waybar
+          community.general.pacman:
+            name: waybar
+            state: present
+        - name: Установка xorg-xwayland, для совместимости с X11-прриложениями
+          community.general.pacman:
+            name: xorg-xwayland
+            state: present
+
+    - name: Установка IPython
+      community.general.pacman:
+        name: ipython
+        state: present
+
+    - name: Терминал
+      block:
+        - name: Установка терминала kitty
+          community.general.pacman:
+            name: kitty
+            state: present
+        - name: Установка zsh
+          community.general.pacman:
+            name: zsh
+            state: present
+        - name: Установка zsh как оболочки по умолчанию
+          user:
+            name: "{{ ansible_user_id }}"
+            shell: /usr/bin/zsh
+        - name: Установка starship
+          shell: "curl -sS https://starship.rs/install.sh | sh -s -- -y"
+          args:
+            creates: /usr/local/bin/starship
+
+    - name: Установка текстового редактора
+      block:
+        - name: Установка neovim
+          community.general.pacman:
+            name: neovim
+            state: present
+        - name: Установка basedpyright 
+          ansible.builtin.pip:
+            name: basedpyright
+            state: present
+        - name: Установка tree-sitter-cli
+          community.general.pacman:
+            name: tree-sitter-cli
+            state: present
+          register: pacman_install_result
+
+    - name: Установка лаунчера приложений rofi
+      community.general.pacman:
+        name: rofi-wayland
+        state: present
+
+    - name: Мультимедиа
+      block: 
+        - name: Установка mpv
+          community.general.pacman:
+            name: mpv
+            state: present
+        - name: Установка vlc
+          community.general.pacman:
+            name: vlc
+            state: present
+
+    - name: Установка просмотрщика изображений sxiv
+      community.general.pacman:
+        name: sxiv
+        state: present
+
+    - name: Установка просмотрщика PDF-файлов zathura
+      community.general.pacman:
+        name:
+          - zathura
+          - zathura-pdf-poppler
+        state: present
+
+    - name: Установка файлового менеджера ranger
+      community.general.pacman:
+        name: ranger
+        state: present
+
+    - name: Шрифты
+      block:
+        - name: Создание каталога для шрифтов
+          ansible.builtin.file:
+            path: ~/.local/share/fonts
+            state: directory
+            mode: '0755'
+        - name: Загрузка и распаковка шрифта JetBrainsMono
+          ansible.builtin.unarchive:
+            src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz"
+            dest: ~/.local/share/fonts
+            remote_src: true
+        - name: Загрузка и распаковка шрифта Terminus
+          ansible.builtin.unarchive:
+            src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Terminus.tar.xz"
+            dest: ~/.local/share/fonts
+            remote_src: true
+        - name: Загрузка и распаковка шрифта SourceCodePro
+          ansible.builtin.unarchive:
+            src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/SourceCodePro.tar.xz"
+            dest: ~/local/share/fonts
+            remote_src: true
+        - name: Обновление кэша шрифтов
+          ansible.builtin.command: fc-cache -fv
+
+    - name: Консольный помощник (AUR helper) для pacman
+      block:
+        - name: Клонирование репозитория yay
+          git:
+            repo: "https://aur.archlinux.org/yay.git"
+            dest: /tmp/yay
+          become: yes
+          become_user: "{{ ansible_user_id }}"
+        - name: Сборка и установка yay
+          command: makepkg -si --noconfirm
+          args:
+            chdir: /tmp/yay
+          become: yes
+          become_user: "{{ ansible_user_id }}"
+
+    - name: Установка веб-браузера Zen
+      community.general.pacman:
+        name: zen-browser-bin
+        state: present
+        executable: yay
+
+    - name: Облачное хранилище файлов yandex-disk
+      block:
+        - name: Установка yandex-disk
+          community.general.pacman:
+            name: yandex-disk
+            state: present
+            executable: yay
+        - name: Конфигурирование yandex-disk
+          command: yandex-disk setup
+          register: setup_status
+          ignore_errors: yes
