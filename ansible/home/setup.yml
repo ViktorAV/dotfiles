@@ -20,20 +20,6 @@
           - wget
         state: present
 
-    - name: Установка nvidia, основные драйвера и поддержка 32-битных приложений
-      community.general.pacman:
-        name:
-          - nvidia
-          - nvidia-utils
-          - lib32-nvidia-utils
-          - nvidia-settings
-        state: present
-
-    - name: Установка intel-ucode, обновления микрокода для стабильности CPU
-      community.general.pacman:
-        name: intel-ucode
-        state: present
-
     - name: Окружение hyprland
       block:
         - name: Установка бэкенд портала рабочего стола для Hyprland
@@ -83,19 +69,15 @@
           community.general.pacman:
             name: neovim
             state: present
-        - name: Установка basedpyright 
-          ansible.builtin.pip:
-            name: basedpyright
-            state: present
         - name: Установка tree-sitter-cli
           community.general.pacman:
             name: tree-sitter-cli
             state: present
           register: pacman_install_result
 
-    - name: Установка лаунчера приложений rofi
+    - name: Установка лаунчера приложений wofi
       community.general.pacman:
-        name: rofi-wayland
+        name: wofi
         state: present
 
     - name: Мультимедиа
@@ -133,21 +115,25 @@
             path: ~/.local/share/fonts
             state: directory
             mode: '0755'
+          become: no
         - name: Загрузка и распаковка шрифта JetBrainsMono
           ansible.builtin.unarchive:
             src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz"
             dest: ~/.local/share/fonts
             remote_src: true
+          become: no
         - name: Загрузка и распаковка шрифта Terminus
           ansible.builtin.unarchive:
             src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Terminus.tar.xz"
             dest: ~/.local/share/fonts
             remote_src: true
+          become: no
         - name: Загрузка и распаковка шрифта SourceCodePro
           ansible.builtin.unarchive:
             src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/SourceCodePro.tar.xz"
-            dest: ~/local/share/fonts
+            dest: ~/.local/share/fonts
             remote_src: true
+          become: no
         - name: Обновление кэша шрифтов
           ansible.builtin.command: fc-cache -fv
 
@@ -155,26 +141,6 @@
       community.general.pacman:
         name: github-cli
         state: present
-
-    - name: Консольный помощник (AUR helper) для pacman
-      block:
-        - name: Клонирование репозитория yay
-          ansible.builtin.git:
-            repo: "https://aur.archlinux.org/yay.git"
-            dest: /tmp/yay
-          become: yes
-          become_user: "{{ ansible_user_id }}"
-        - name: Сборка и установка yay
-          ansible.builtin.command:
-            cmd: makepkg -si --noconfirm
-            chdir: /tmp/yay
-            creates: /usr/bin/yay
-            become: yes
-            become_user: "{{ ansible_user_id }}"
-        - name: Удаление каталога сборки /tmp/yay
-          ansible.builtin.file:
-            path: /tmp/yay
-            state: absent
 
     - name: Установка веб-браузера Zen
       community.general.pacman:
