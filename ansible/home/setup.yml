@@ -48,6 +48,10 @@
           community.general.pacman:
             name: xorg-xwayland
             state: present
+        - name: Установка менеджера дисплеев wlr-randr
+          community.general.pacman:
+            name: wlr-randr
+            state: present
 
     - name: Установка IPython
       community.general.pacman:
@@ -147,20 +151,30 @@
         - name: Обновление кэша шрифтов
           ansible.builtin.command: fc-cache -fv
 
+    - name: Установка githhub-cli
+      community.general.pacman:
+        name: github-cli
+        state: present
+
     - name: Консольный помощник (AUR helper) для pacman
       block:
         - name: Клонирование репозитория yay
-          git:
+          ansible.builtin.git:
             repo: "https://aur.archlinux.org/yay.git"
             dest: /tmp/yay
           become: yes
           become_user: "{{ ansible_user_id }}"
         - name: Сборка и установка yay
-          command: makepkg -si --noconfirm
-          args:
+          ansible.builtin.command:
+            cmd: makepkg -si --noconfirm
             chdir: /tmp/yay
-          become: yes
-          become_user: "{{ ansible_user_id }}"
+            creates: /usr/bin/yay
+            become: yes
+            become_user: "{{ ansible_user_id }}"
+        - name: Удаление каталога сборки /tmp/yay
+          ansible.builtin.file:
+            path: /tmp/yay
+            state: absent
 
     - name: Установка веб-браузера Zen
       community.general.pacman:
@@ -175,7 +189,3 @@
             name: yandex-disk
             state: present
             executable: yay
-        - name: Конфигурирование yandex-disk
-          command: yandex-disk setup
-          register: setup_status
-          ignore_errors: yes

@@ -36,7 +36,7 @@ return {
                 -- sort_last_used = true,
             },
             file_ignore_patterns = {
-                '.git',
+                -- '.git',
                 '__pycache__',
             },
         })

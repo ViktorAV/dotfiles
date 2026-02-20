@@ -13,6 +13,9 @@ script_path = os.path.realpath(__file__)
 dotfiles_path = os.path.dirname(script_path)
 home_path = os.path.expanduser('~')
 
+ignore_dirs = ['.git']
+ignore_files = [script_path]
+
 def make_not_existing_dirs(path: str):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -58,7 +61,10 @@ def pull_files(args):
 
 def push_files(args):
     '''Создает символические ссылки на конфигурационные файлы'''
-    for root, _, files in os.walk(dotfiles_path):
+    for root, dirs, files in os.walk(dotfiles_path):
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        files[:] = [f for f in files if f not in ignore_files]
+
         for file in files:
             if os.path.relpath(root, dotfiles_path) == '.':
                 src_path = os.path.join(dotfiles_path, file)
@@ -68,9 +74,6 @@ def push_files(args):
                 dst_path = os.path.join(home_path,
                                         root[len(dotfiles_path)+1:],
                                         file)
-
-            if src_path == script_path:
-                continue
 
             if os.path.exists(dst_path):
                 if os.path.realpath(dst_path) == src_path:
