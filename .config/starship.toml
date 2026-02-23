@@ -1,0 +1,62 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Добавляет пустую строку после каждого вывода команд
+add_newline = true
+
+format = """\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_commit\
+$git_status\
+$package\
+$python\
+$cmd_duration\
+$shell\
+$line_break\
+$character"""
+# $username - имя пользователя
+# $hostname - имя хоста
+# $directory - текущая директория
+# $line_break - перевод строки
+# $cmd_duration - время выполнения команды
+# $character - символ перед вводом команды, например $.
+
+# Disable the package module, hiding it from the prompt completely
+[package]
+disabled = true
+
+# Выводит стрелку перед полем ввода команды, по умолчанию ❯.
+# Зеленая если команда выполнена успешна, иначе красная.
+[character]
+success_symbol = '[➜](bold green)'
+error_symbol = '[➜](bold red)'
+
+[line_break]
+disabled = false
+
+[username]
+# show_always = false
+style_user = "bold blue"
+format = "[$user@$hostname]($style)"
+
+[directory]
+style = "bold green"
+format = "[$path]($style) "
+truncation_length = 0
+# trancate_to_repo=true
+
+[git_branch]
+symbol = " "
+style = "bold yellow"
+format = "on [$symbol $branch]($style)"
+
+[git_status]
+style = "red"
+format = " [±$staged$unstaged]($style) "
+
+[cmd_duration]
+style = "dimmed"
+format = " [took $duration]($style) "

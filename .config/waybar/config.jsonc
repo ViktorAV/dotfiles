@@ -1,0 +1,77 @@
+{
+    "output": "DVI-D-2",
+    // "height": 40,
+    "spacing": 5, 
+
+    "modules-left": [
+        "hyprland/window",
+        "mpris"
+    ],
+    "modules-center": [
+        "hyprland/workspaces"
+    ],
+    "modules-right": [
+        "pulseaudio",
+        "clock"
+    ],
+
+    "hyprland/workspaces": {
+        "all-outputs": true,
+        "warp-on-scroll": false,
+        "enable-bar-scroll": false,
+        "disable-scroll-wraparound": true,
+        "active-only": false,
+        "format": "{icon}",
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            "coding": "CODING",
+            "internet": "INTERNET",
+            "video": "VIDEO",
+            "book": "BOOK",
+            "notes": "NOTES",
+            "directories": "DIRECTORIES",
+            "audio": "AUDIO",
+            "default": "•"
+        }
+    },
+    "hyprland/window": {
+        "format": "{title}", 
+        "max-length": 20,
+        "min-length": 0,
+        "all-outputs": true
+    },
+    "clock": {
+        "interval": 50,
+        "format": "{:%Y-%m-%d, %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "pulseaudio": {
+      "format": "{format_source} {icon} {volume}%",
+      "format-muted": "{format_source}   {volume}%",
+      "format-source": " ",
+      "format-source-muted": " ",
+      "format-icons": {
+        "default": ["", "", " "]
+      },
+      "on-click": "pavucontrol"
+    },
+    "mpris": {
+        "format": "{status_icon} | {dynamic}",
+        "interval": 1,
+        "dynamic-len": 40,
+        "status-icons": {
+            "playing": "⏸",
+            "paused": "▶",
+            "stopped": ""
+        },
+        "dynamic-order": ["artist"]
+    }
+}

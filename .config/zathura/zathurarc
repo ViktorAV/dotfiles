@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Режим отображения интерфейса
+set guioptions 'v'
+
+# Авто размер документа при открытии
+set adjust-open 'best-fit'
+
+# Фон строки состояния
+set statusbar-bg 'transparent'
+
+# Шрифт приложения
+ set font 'JetBrainsMonoNerdFont normal 30'
+
+# Настройка прокрутки документа
+set scroll-step 300
+
+
+# Цвета
+# Включить свои цвета
+set recolor true
+
+# Цвет текста и фона приложения
+set default-fg '#b57614'
+set default-bg '#0a120d'
+
+# Цвет текста и фона документа   # #996600 #D19A66 #8F5902 #dbbc7f #e5c49e
+set recolor-darkcolor  '#e8b26a' #D19A66 # #e8e4c9 #f3e3c3 #c1d0b5 #e6e1cf #ebdbb2 #deb887 #B57614
+set recolor-lightcolor '#1a120d' # #d6bb87 #8f673d #c5784c #893618 #061923 #141c21
+
+# Не красить изображения
+set recolor-keephue 'true'
+
+#set recolor-reverse-video 'true'
+
+
+# Клавиши
+# Изменение цветов документа
+#map i recollor
+
+# Перемещение по документу
+#map j scroll-down
+#map k scroll-up

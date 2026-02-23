@@ -1,0 +1,71 @@
+/* colors defined at top for easy configuring */
+@define-color background #2C2A24;
+@define-color second-background #3A372F;
+@define-color focused #D08B57;
+
+
+/* font declared */
+* {
+  font-family: "JetBrainsMono Nerd Font", monospace, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+window#waybar {
+  background-color: transparent;
+  color: #b57614;
+}
+
+/* configuring the modules */
+#clock,
+#workspaces,
+#window {
+  background-color: #101010;
+  padding: 0 15px 0 15px;
+}
+
+.modules-left {
+  margin: 0 0 0 10px;
+  padding: 0 0 0 15px;
+}
+
+.modules-center {
+  margin: 0 0 0 0;
+  /* padding: 0 10px 0 10px; */
+}
+
+.modules-right {
+  margin: 0 10px 0 0;
+  padding: 0 10px 0 15px;
+}
+
+#workspaces button {
+  min-width: 0;
+  padding: 0 8px 0 8px;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+#workspaces button:hover {
+  background-color: @second-background;
+}
+
+#workspaces button.active,
+#workspaces button.focused {
+  color: @focused;
+  font-weight: bold;
+  /* background-color: @second-background; */
+}
+
+#workspaces button.urgent {
+  background-color: maroon;
+}
+
+#mpris {
+  margin: 0 0 0 5px;
+  padding: 0 9px;
+}
+
+#mpris.playing {
+  border-radius: 2px;
+}

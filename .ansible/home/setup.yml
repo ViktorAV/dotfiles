@@ -1,0 +1,265 @@
+- name: Настройка локальной Archlinux системы
+  hosts: local
+  become: yes
+
+  tasks:
+    - name: Обновление Archlinux
+      community.general.pacman:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Установка необходимых пакетов
+      community.general.pacman:
+        name: 
+          - base-devel
+          - linux
+          - linux-headers
+          - git
+          - curl
+        state: present
+
+    - name: Установка дополнительных пакетов wget btop bat
+      community.general.pacman:
+        name: 
+          - wget
+          - btop
+          - bat
+        state: present
+
+    - name: Git
+      block:
+        - name: Установка Git
+          community.general.pacman:
+            name: git
+            state: present
+        - name: Изменение имени пользователя Git глобально
+          community.general.git_config:
+            name: user.name
+            scope: global
+            value: "ViktorAV"
+        - name: Изменение электронной почты Git глобально
+          community.general.git_config:
+            name: user.email
+            scope: global
+            value: "mrtrac@yandex.ru"
+        - name: Изменение ветки Git по умолчанию, глобально
+          community.general.git_config:
+            name: defaultBranch
+            scope: global
+            value: "main"
+        - name: Установка github-cli
+          community.general.pacman:
+            name: github-cli
+            state: present
+
+    - name: Установка Python
+      block:
+        - name: Установка менеджера пакетов Python-pip
+          community.general.pacman:
+            name: python-pip
+            state: present
+        - name: Установка менеджера пакетов Python-pipx
+          community.general.pacman:
+            name: python-pipx
+            state: present
+        - name: Установка IPython
+          community.general.pacman:
+            name: ipython
+            state: present
+
+    - name: Окружение hyprland
+      block:
+        - name: Установка бэкенд портала рабочего стола для Hyprland
+          community.general.pacman:
+            name: xdg-desktop-portal-hyprland
+            state: present
+        - name: Установка панели состояния waybar
+          community.general.pacman:
+            name: waybar
+            state: present
+        - name: Установка xorg-xwayland, для совместимости с X11-прриложениями
+          community.general.pacman:
+            name: xorg-xwayland
+            state: present
+        - name: Установка колор-пикера hyprpicker
+          community.general.pacman:
+            name: hyprpicker
+            state: present
+
+    - name: Установка менеджера буфера обмена
+      community.general.pacman:
+        name: cliphist
+        state: present
+
+    - name: Установка менеджера уведомлений dunst и libnotify
+      community.general.pacman:
+        name: 
+          - dunst
+          - libnotify
+        state: present
+
+    - name: Терминал
+      block:
+        - name: Установка терминала kitty
+          community.general.pacman:
+            name: kitty
+            state: present
+        - name: Установка zsh
+          community.general.pacman:
+            name: zsh
+            state: present
+        - name: Установка zsh как оболочки по умолчанию
+          ansible.builtin.user:
+            name: trac
+            shell: /bin/zsh
+        - name: Установка starship
+          shell: "curl -sS https://starship.rs/install.sh | sh -s -- -y"
+          args:
+            creates: /usr/local/bin/starship
+        - name: Установка Askpass Helper Zenity для sudo
+          community.general.pacman:
+            name: zenity
+            state: present
+        - name: Установка мультиплексера терминала Tmux
+          community.general.pacman:
+            name: tmux
+            state: present
+        - name: Установка менеджера плагинов Tmux (C-b + S-i внутри tmux)
+          ansible.builtin.git:
+            repo: https://github.com/tmux-plugins/tpm
+            dest: ~/.config/tmux/plugins/tpm
+            clone: yes
+          become: no
+
+    - name: Установка текстового редактора
+      block:
+        - name: Установка neovim
+          community.general.pacman:
+            name: neovim
+            state: present
+        - name: Установка tree-sitter-cli для плагина Treesitter
+          community.general.pacman:
+            name: tree-sitter-cli
+            state: present
+        - name: Установка LSP-сервера basedpyright (форк pyright)
+          community.general.pipx:
+            name: basedpyright
+            state: install
+
+    - name: Управление биндами клавиш
+      block:
+        - name: Установка маппера клавиш keyd
+          ansible.builtin.pacman:
+            name: keyd
+            state: present
+        - name: Запуск службы keyd
+          ansible.builtin.service:
+            name: keyd
+            state: started
+            enabled: yes
+
+    - name: Установка лаунчера приложений rofi
+      community.general.pacman:
+        name: rofi
+        state: present
+
+    - name: Мультимедиа
+      block: 
+        - name: Установка mpv
+          community.general.pacman:
+            name: mpv
+            state: present
+        - name: Установка загрузчика yt-dlp
+          community.general.pacman:
+            name: yt-dlp
+            state: present
+        - name: Установка vlc
+          community.general.pacman:
+            name: vlc
+            state: present
+        - name: Установка просмотрщика изображений sxiv
+          community.general.pacman:
+            name: sxiv
+            state: present
+        - name: Установка просмотрщика PDF-файлов zathura
+          community.general.pacman:
+            name:
+              - zathura
+              - zathura-pdf-poppler
+            state: present
+
+    - name: Установка файлового менеджера ranger
+      community.general.pacman:
+        name: ranger
+        state: present
+
+    - name: Шрифты
+      vars:
+        font_directories:
+          - ~/.local
+          - ~/.local/share
+          - ~/.local/share/fonts
+          - ~/.local/share/fonts/JetBrainsMono
+          - ~/.local/share/fonts/EnvyCodeR
+          - ~/.local/share/fonts/FiraCode
+      block:
+        - name: Создание каталога для шрифтов
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            mode: '0755'
+          loop: "{{ font_directories }}"
+          become: no
+        - name: Загрузка и распаковка шрифта JetBrainsMono
+          ansible.builtin.unarchive:
+            src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz"
+            dest: ~/.local/share/fonts/JetBrainsMono
+            remote_src: true
+          become: no
+        - name: Загрузка и распаковка шрифта EnvyCodeR
+          ansible.builtin.unarchive:
+            src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/EnvyCodeR.tar.xz"
+            dest: ~/.local/share/fonts/EnvyCodeR
+            remote_src: true
+          become: no
+        - name: Загрузка и распаковка шрифта FiraCode
+          ansible.builtin.unarchive:
+            src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.tar.xz"
+            dest: ~/.local/share/fonts/FiraCode
+            remote_src: true
+          become: no
+        - name: Обновление кэша шрифтов
+          ansible.builtin.command: fc-cache -fv
+
+    - name: Менеджер пакетов yay
+      block:
+        - name: Клонирование репозитория yay
+          ansible.builtin.git:
+            repo: "https://aur.archlinux.org/yay.git"
+            dest: ~/yay
+            depth: 1
+          become: no
+        - name: Сборка и установка yay
+          ansible.builtin.command:
+            cmd: makepkg -si --noconfirm
+            chdir: ~/yay
+          become: no
+          register: makepkg_result
+          changed_when: "'there is nothing to build' not in makepkg_result.stdout"
+        - name: Удаление временной директории
+          ansible.builtin.file:
+            path: ~/yay
+            state: absent
+          become: no
+
+    - name: Установка браузера Zen
+      ansible.builtin.command: yay -S --noconfirm zen-browser-bin
+      become: no
+      register: yay_result
+      changed_when: "'nothing to do' not in yay_result.stdout"
+
+    - name: Установка yandex-disk
+      ansible.builtin.command: yay -S --noconfirm yandex-disk
+      become: no
+      register: yandex_result
+      changed_when: "'nothing to do' not in yandex_result.stdout"
