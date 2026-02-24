@@ -18,12 +18,13 @@
           - curl
         state: present
 
-    - name: Установка дополнительных пакетов wget btop bat
+    - name: Установка дополнительных пакетов wget btop bat less
       community.general.pacman:
         name: 
           - wget
           - btop
           - bat
+          - less
         state: present
 
     - name: Git
@@ -44,7 +45,7 @@
             value: "mrtrac@yandex.ru"
         - name: Изменение ветки Git по умолчанию, глобально
           community.general.git_config:
-            name: defaultBranch
+            name: branch.defaultBranch
             scope: global
             value: "main"
         - name: Установка github-cli
@@ -155,8 +156,8 @@
             state: present
         - name: Создание символической ссылки на конф файл
           ansible.builtin.file:
-            src: /etc/keyd/default.conf
-            dst: /home/trac/yadisk/dotfiles/etc/keyd/default.conf
+            src: /home/trac/yadisk/dotfiles/etc/keyd/default.conf
+            dst: /etc/keyd/default.conf
             state: link
             force: no
         - name: Запуск службы keyd
@@ -250,7 +251,7 @@
           ansible.builtin.command:
             cmd: makepkg -si --noconfirm
             chdir: ~/paru
-          become: no
+            become: no
           register: makepkg_result
           changed_when: "'there is nothing to build' not in makepkg_result.stdout"
         - name: Удаление временной директории

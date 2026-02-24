@@ -92,5 +92,5 @@ alias timestamp='date "+%s"'
 eval "$(starship init zsh)"
 
 # fzf
-eval "$(fzf --zsh)"
-# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# eval "$(fzf --zsh)"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
