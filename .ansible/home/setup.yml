@@ -98,6 +98,11 @@
           - libnotify
         state: present
 
+    - name: Установка Askpass Helper lxqt-openssh-askpass
+      community.general.pacman:
+        name: lxqt-openssh-askpass
+        state: present
+
     - name: Терминал
       block:
         - name: Установка терминала kitty
@@ -116,10 +121,6 @@
           shell: "curl -sS https://starship.rs/install.sh | sh -s -- -y"
           args:
             creates: /usr/local/bin/starship
-        - name: Установка Askpass Helper Zenity для sudo
-          community.general.pacman:
-            name: zenity
-            state: present
         - name: Установка мультиплексера терминала Tmux
           community.general.pacman:
             name: tmux
@@ -152,6 +153,12 @@
           ansible.builtin.pacman:
             name: keyd
             state: present
+        - name: Создание символической ссылки на конф файл
+          ansible.builtin.file:
+            src: /etc/keyd/default.conf
+            dst: /home/trac/yadisk/dotfiles/etc/keyd/default.conf
+            state: link
+            force: no
         - name: Запуск службы keyd
           ansible.builtin.service:
             name: keyd
@@ -231,35 +238,35 @@
         - name: Обновление кэша шрифтов
           ansible.builtin.command: fc-cache -fv
 
-    - name: Менеджер пакетов yay
+    - name: Менеджер пакетов paru
       block:
-        - name: Клонирование репозитория yay
+        - name: Клонирование репозитория paru
           ansible.builtin.git:
-            repo: "https://aur.archlinux.org/yay.git"
-            dest: ~/yay
+            repo: "https://aur.archlinux.org/paru.git"
+            dest: ~/paru
             depth: 1
           become: no
-        - name: Сборка и установка yay
+        - name: Сборка и установка paru
           ansible.builtin.command:
             cmd: makepkg -si --noconfirm
-            chdir: ~/yay
+            chdir: ~/paru
           become: no
           register: makepkg_result
           changed_when: "'there is nothing to build' not in makepkg_result.stdout"
         - name: Удаление временной директории
           ansible.builtin.file:
-            path: ~/yay
+            path: ~/paru
             state: absent
           become: no
 
     - name: Установка браузера Zen
-      ansible.builtin.command: yay -S --noconfirm zen-browser-bin
+      ansible.builtin.command: paru -S --noconfirm zen-browser-bin
       become: no
-      register: yay_result
-      changed_when: "'nothing to do' not in yay_result.stdout"
+      register: zen_result
+      changed_when: "'nothing to do' not in zen_result.stdout"
 
     - name: Установка yandex-disk
-      ansible.builtin.command: yay -S --noconfirm yandex-disk
+      ansible.builtin.command: paru -S --noconfirm yandex-disk
       become: no
       register: yandex_result
       changed_when: "'nothing to do' not in yandex_result.stdout"

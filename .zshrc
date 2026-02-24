@@ -24,7 +24,8 @@ export SUDO_EDITOR="nvim"
 export TERM="xterm-kitty"
 export PATH=$PATH:/usr/sbin:~/.local/bin
 export PAGER="less"
-export SUDO_ASKPASS="$HOME/yadisk/dotfiles/askpass.sh"
+# export SUDO_ASKPASS="$HOME/yadisk/dotfiles/askpass.sh"
+export SUDO_ASKPASS="/usr/bin/lxqt-openssh-askpass"
 
 # История
 HISTFILE=~/.history
