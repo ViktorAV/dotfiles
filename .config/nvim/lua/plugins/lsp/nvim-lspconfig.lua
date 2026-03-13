@@ -37,6 +37,13 @@ return {
 
         vim.lsp.config('basedpyright', {
             capabilities = capabilities,
+            root_dir = function(bufnr, on_dir)
+                local fname = vim.api.nvim_buf_get_name(bufnr)
+                local root = vim.fs.root(fname, { 'src/', '.git' })
+                if root then
+                    on_dir(root)
+                end
+            end,
             settings = {
                 basedpyright = {
                     typeCheckingMode = 'standard', -- off, standard

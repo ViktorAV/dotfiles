@@ -42,7 +42,7 @@ vim.keymap.set('n', '<C-r>', function()
         vim.api.nvim_buf_delete(0, { force = true })
     end
 end, { desc = 'delete and close bufer' })
-vim.keymap.set('n', '<C-s>', ':!save_path %<cr>', { desc = 'safe file' })
+vim.keymap.set('n', '<C-s>', ':!save_path %<cr>', { desc = 'safe file', silent = true })
 vim.keymap.set('n', '<leader>bc', '<cmd>new<cr>', { desc = 'create buffer' })
 vim.keymap.set('n', '<leader>bn', '<cmd>bn<cr>', { desc = 'next buffer' })
 vim.keymap.set('n', '<leader>bp', '<cmd>bp<cr>', { desc = 'prev buffer' })
@@ -79,7 +79,26 @@ end, { desc = 'copy filepath to the clipboard'})
 -- vim.keymap.set('n', '<leader>se', '<C-w>=', { desc = 'make split windows equal size' })
 -- vim.keymap.set('n', '<leader>sx', '<cmd>close<CR>', { desc = 'close current split window' })
 
+vim.keymap.set('n', '<leader>gi', function()
+    vim.cmd('w')
+    local current_file = vim.api.nvim_buf_get_name(0)
+    local command = 'silent !kitty --title=float sh -c "ipython -i ' .. current_file .. '" 2>/dev/null'
+    vim.cmd(command)
+end, { desc = 'Запускает IPython для текущего скрипта', noremap = true, silent = true })
+
 
 -- Команды
-vim.api.nvim_create_user_command('W', ':w !sudo tee %', { nargs = 0 })
+vim.api.nvim_create_user_command('W', function()
+    vim.cmd('silent w !sudo tee % > /dev/null')
+    vim.cmd('edit!')
+end, {
+    desc = 'Сохраняет файл с правами sudo'
+})
 
+vim.api.nvim_create_user_command('Signal', function()
+    vim.cmd('w')
+    vim.cmd('silent !kill -SIGUSR1 `cat $mastery_pid`')
+end, {
+	bang = true,
+    desc = 'Отправляет сигнал на перечитывание файла в mastery'
+})

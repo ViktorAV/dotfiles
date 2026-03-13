@@ -20,12 +20,18 @@ zinit light Aloxaf/fzf-tab
 # Переменные
 # export EDITOR="emacsclient -c -a 'emacs' --frame-parameters='(quote (name . \"float\"))'"
 export EDITOR="nvim"
-export SUDO_EDITOR="nvim"
+export VISUAL=$EDITOR
+export SUDO_EDITOR=$EDITOR
 export TERM="xterm-kitty"
-export PATH=$PATH:/usr/sbin:~/.local/bin
+export TERMINAL="kitty"
+export PATH=$PATH:/usr/sbin:~/.local/bin:~/.cargo/bin
 export PAGER="less"
 # export SUDO_ASKPASS="$HOME/yadisk/dotfiles/askpass.sh"
 export SUDO_ASKPASS="/usr/bin/lxqt-openssh-askpass"
+export mastery_pid="$HOME/yadisk/code/python/mastery/data/pid"
+
+export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_SESSION_TYPE=wayland
 
 # История
 HISTFILE=~/.history

@@ -67,6 +67,10 @@
           community.general.pacman:
             name: ipython
             state: present
+        - name: Установка python-библиотеки textual
+          community.general.pacman:
+            name: python-textual
+            state: present
 
     - name: Окружение hyprland
       block:
@@ -147,6 +151,7 @@
           community.general.pipx:
             name: basedpyright
             state: install
+          become: no
 
     - name: Управление биндами клавиш
       block:
@@ -271,3 +276,9 @@
       become: no
       register: yandex_result
       changed_when: "'nothing to do' not in yandex_result.stdout"
+
+    - name: Установка скриншотера Hyprshot
+      ansible.builtin.command: paru -S --noconfirm hyprshot
+      become: no
+      register: hyprshot_result
+      changed_when: "'nothing to do' not in hyprshot_result.stdout"
