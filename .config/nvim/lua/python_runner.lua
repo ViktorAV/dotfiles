@@ -3,11 +3,16 @@ local PythonRunner = {}
 PythonRunner.config = {
     root_files = { "app.py", "main.py" },
     interpreter = "python",
-    interpreters = { "python", "python -i", "ipython", "ipython -i" },
-    interpreter_save_file = vim.fn.stdpath("data") .. "/python_runner.json",
+    interpreters = { "python",
+                       "python -i",
+                       "python -m pdb",
+                       "ipython --no-confirm-exit",
+                       "ipython --no-confirm-exit -i",
+                     },
+    save_file = vim.fn.stdpath("data") .. "/python_runner.json",
     term_name_prefix = 'Python: ',
     close_on_exit = true, -- закрыть терминал после выполнения
-    open_in_split = true, -- открывать в сплите или новом буфере
+    open_in_split = true, -- открывать в сплите или во внешнем терминале kitty
     split_direction = 'belowright', -- belowright, aboveleft, totheleft, toright
     split_size = '10', -- высота/ширина в строках/символах
 }
@@ -18,8 +23,8 @@ function PythonRunner.set_config(options)
   end
 end
 
-function PythonRunner.load_interpreter_pick()
-  local file = io.open(PythonRunner.config.interpreter_save_file, "r")
+function PythonRunner.load_config()
+  local file = io.open(PythonRunner.config.save_file, "r")
   if file then
     local content = file:read("*all")
     file:close()
@@ -32,7 +37,7 @@ function PythonRunner.save_interpreter_pick(selection)
   PythonRunner.config.interpreter = selection
   local data = { interpreter = selection }
   local json_data = vim.json.encode(data)
-  local file, err = io.open(PythonRunner.config.interpreter_save_file, "w")
+  local file, err = io.open(PythonRunner.config.save_file, "w")
   if file then
     file:write(json_data)
     file:close()
@@ -42,61 +47,46 @@ function PythonRunner.save_interpreter_pick(selection)
 end
 
 function PythonRunner.pick_interpreter()
-  PythonRunner.load_interpreter_pick()
-  local display_interpreters = {}
-  for i, item in ipairs(PythonRunner.config.interpreters) do
-    local marker = (item == PythonRunner.config.interpreter) and "✓ " or "  "
-    table.insert(display_interpreters, marker .. item)
-  end
+  PythonRunner.load_config()
   vim.ui.select(
-    display_interpreters,
-    { prompt = "Выберите интерпретатор Python:", format_item = function(item) return item end },
+    PythonRunner.config.interpreters,
+    { prompt = "Выберите интерпретатор Python:",
+      format_item = function(item)
+          local marker = (item == PythonRunner.config.interpreter) and "✓ " or "  "
+          return marker .. item
+      end
+    },
     function(choice, idx)
       if choice and idx then
-        local original_choice = choice:gsub("^%s*✓?%s*", "")
-        PythonRunner.save_interpreter_pick(original_choice)
-        -- vim.notify("Выбран: " .. original_choice, vim.log.levels.INFO)
+          PythonRunner.save_interpreter_pick(choice)
+        -- vim.notify("Выбран: '" .. choice .. "'", vim.log.levels.INFO)
       end
     end
   )
 end
 
--- function PythonRunner.find_project_root()
---   local current_dir = vim.fn.getcwd()
---
---   local dir = current_dir
---   while dir and dir ~= "/" do
---     for _, marker in ipairs(PythonRunner.config.root_markers) do
---       if vim.loop.fs_stat(dir .. "/" .. marker) then
---         return dir
---       end
---     end
---     local parent = dir:match("^(.*)/[^/]*$")
---     if not parent or parent == dir then break end
---     dir = parent
---   end
---   return current_dir -- Возвращаем текущую директорию, если корень не найден
--- end
+function PythonRunner.find_project_root(current_dir)
+  local dir = current_dir
+  while dir and dir ~= "/" do
+    for _, marker in ipairs(PythonRunner.config.root_files) do
+      if vim.loop.fs_stat(dir .. "/" .. marker) then
+        return dir
+      end
+    end
+    local parent = dir:match("^(.*)/[^/]*$")
+    if not parent or parent == dir then break end
+    dir = parent
+  end
+  return current_dir -- Возвращаем текущую директорию, если корень не найден
+end
 
-function PythonRunner.find_root_file(start_path)
-    local current_path = start_path or vim.fn.getcwd()
+function PythonRunner.find_root_file(root_dir)
+    for _, filename in ipairs(PythonRunner.config.root_files) do
+        local full_path = vim.fs.joinpath(root_dir, filename)
 
-    while current_path do
-        for _, filename in ipairs(PythonRunner.config.root_files) do
-            local full_path = vim.fs.joinpath(current_path, filename)
-
-            if vim.loop.fs_stat(full_path) then
-                return full_path
-            end
+        if vim.loop.fs_stat(full_path) then
+            return full_path
         end
-
-        local parent_path = vim.fs.dirname(current_path)
-
-        if parent_path == current_path then
-            break
-        end
-
-        current_path = parent_path
     end
 
     return nil
@@ -104,10 +94,11 @@ end
 
 function PythonRunner.run_python(isproject)
     local current_file
-    local working_dir =  vim.fn.getcwd()
+    local current_dir = vim.fn.expand("%:p:h")
+    local working_dir = PythonRunner.find_project_root(current_dir)
 
     if isproject then
-        current_file = PythonRunner.find_root_file(vim.fs.dirname(vim.fn.expand('%:p')))
+        current_file = PythonRunner.find_root_file(working_dir)
 
         if not current_file then 
             vim.notify("🔎 Корневой файл из каталога " .. working_dir .. " не найден", vim.log.levels.INFO)
@@ -121,16 +112,12 @@ function PythonRunner.run_python(isproject)
 
     local filename = vim.fn.expand('%:t')
 
-    -- if not current_file:match("%.py$") then
-    --     vim.notify("❌ Не Python‑файл: " .. filename, vim.log.levels.WARN)
-    --     return
-    -- end
-
     local python_cmd = PythonRunner.config.interpreter .. " " .. current_file
+
+    vim.cmd('w')
 
     if PythonRunner.config.open_in_split then
         local term_cmd = 'cd ' .. working_dir .. ' && ' .. python_cmd
-        vim.cmd('w')
         vim.cmd(PythonRunner.config.split_direction .. ' split ' .. PythonRunner.config.split_size)
         vim.cmd('term ' .. term_cmd)
         
@@ -154,11 +141,9 @@ function PythonRunner.run_python(isproject)
                         vim.api.nvim_buf_delete(bufnr, { force = true })
                     end)
                 end
-
             })
         end
     else
-        vim.cmd('w')
         local command = ''
         if PythonRunner.config.close_on_exit then
             local command = 'silent !kitty --title=float sh -c "' .. python_cmd .. '"'
