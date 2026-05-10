@@ -2,7 +2,9 @@
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true
-vim.opt.updatetime = 100
+vim.opt.confirm = true
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
 vim.opt.shell = '/bin/zsh'
 -- vim.g.did_load_filetypes = 1
 vim.opt.fo= 't'
@@ -64,12 +66,13 @@ vim.opt.clipboard:append('unnamedplus')
 -- vim.opt.shortmess:append('c')
 
 -- Indent Settings
+vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
 vim.opt.autoindent = true
 vim.opt.smartindent = true
+vim.opt.smarttab = true
 vim.wo.linebreak = true
 
 -- Fillchars

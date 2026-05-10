@@ -14,6 +14,9 @@ vim.keymap.set({'i', 'n', 'v', 'c', 't', 'x'}, ':', ';', { noremap = true, silen
 vim.api.nvim_set_keymap('n', '<A-`>', 'a<C-v>u0301<Esc>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('i', '<A-`>', '<C-v>u0301', {noremap = true, silent = true})
 
+-- LSP
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list'})
+
 -- Передвижение
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = "moves lines down in visual selection" })
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = "moves lines up in visual selection" })
@@ -78,6 +81,15 @@ end, { desc = 'copy filepath to the clipboard'})
 -- vim.keymap.set('n', '<leader>sh', '<C-w>s', { desc = 'split window horizontally' })
 -- vim.keymap.set('n', '<leader>se', '<C-w>=', { desc = 'make split windows equal size' })
 -- vim.keymap.set('n', '<leader>sx', '<cmd>close<CR>', { desc = 'close current split window' })
+-- vim.keymap.set('n', '<C-w>q', '<cmd>close<cr>', { desc = 'close current window' })
+-- C-S-h/j/k/l (resize) 
+-- C-S-f (zoom?)
+vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-w>f', '<cmd>tab split<cr>', { desc = '"Fullscreen" window' })
+vim.keymap.set('n', '<C-Enter>', '<C-w>v', { desc = 'Split window vertically' })
 
 vim.keymap.set('n', '<leader>gi', function()
     vim.cmd('w')

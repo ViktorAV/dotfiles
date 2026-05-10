@@ -12,8 +12,13 @@ local set = vim.opt_local
 -- vim.keymap.set('n', '<A-Enter>', ':Signal<CR>', { noremap = true, silent = true })
 
 vim.keymap.set('n', '<Enter>', function()
-    vim.cmd('w')
-    local current_file = vim.api.nvim_buf_get_name(0)
-    local command = 'silent !kitty --hold --title=float sh -c "python ' .. current_file .. '" 2>/dev/null'
-    vim.cmd(command)
+    vim.cmd('RunPython')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<C-Enter>', function()
+    vim.cmd('RunPythonProject')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<S-Enter>', function()
+    vim.cmd('PickPythonInterpreter')
 end, { noremap = true, silent = true })

@@ -4,8 +4,7 @@
     "spacing": 5, 
 
     "modules-left": [
-        "hyprland/window",
-        "mpris"
+        "hyprland/window"
     ],
     "modules-center": [
         "hyprland/workspaces"
@@ -44,7 +43,7 @@
     },
     "hyprland/window": {
         "format": "{title}", 
-        "max-length": 20,
+        "max-length": 50,
         "min-length": 0,
         "all-outputs": true
     },
@@ -62,16 +61,5 @@
         "default": ["", "", " "]
       },
       "on-click": "pavucontrol"
-    },
-    "mpris": {
-        "format": "{status_icon} | {dynamic}",
-        "interval": 1,
-        "dynamic-len": 40,
-        "status-icons": {
-            "playing": "⏸",
-            "paused": "▶",
-            "stopped": ""
-        },
-        "dynamic-order": ["artist"]
     }
 }
