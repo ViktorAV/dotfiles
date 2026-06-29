@@ -11,14 +11,14 @@ local set = vim.opt_local
 
 -- vim.keymap.set('n', '<A-Enter>', ':Signal<CR>', { noremap = true, silent = true })
 
-vim.keymap.set('n', '<Enter>', function()
-    vim.cmd('RunPython')
-end, { noremap = true, silent = true })
-
 vim.keymap.set('n', '<C-Enter>', function()
     vim.cmd('RunPythonProject')
 end, { noremap = true, silent = true })
 
 vim.keymap.set('n', '<S-Enter>', function()
-    vim.cmd('PickPythonInterpreter')
+    vim.cmd('PythonRunnerConfigure')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<Enter>', function()
+    vim.cmd('RunPythonScript')
 end, { noremap = true, silent = true })

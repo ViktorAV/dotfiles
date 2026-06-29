@@ -83,21 +83,61 @@ end, { desc = 'copy filepath to the clipboard'})
 -- vim.keymap.set('n', '<leader>sx', '<cmd>close<CR>', { desc = 'close current split window' })
 -- vim.keymap.set('n', '<C-w>q', '<cmd>close<cr>', { desc = 'close current window' })
 -- C-S-h/j/k/l (resize) 
--- C-S-f (zoom?)
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<C-w>f', '<cmd>tab split<cr>', { desc = '"Fullscreen" window' })
-vim.keymap.set('n', '<C-Enter>', '<C-w>v', { desc = 'Split window vertically' })
+vim.keymap.set('n', '<C-x>', '<C-w>c', { desc = 'Move focus to the upper window' })
 
-vim.keymap.set('n', '<leader>gi', function()
-    vim.cmd('w')
-    local current_file = vim.api.nvim_buf_get_name(0)
-    local command = 'silent !kitty --title=float sh -c "ipython -i ' .. current_file .. '" 2>/dev/null'
-    vim.cmd(command)
-end, { desc = 'Запускает IPython для текущего скрипта', noremap = true, silent = true })
+local function toggle_fullscreen()
+  local api = vim.api
+  local current_win = api.nvim_get_current_win()
 
+  local success, win_vars = pcall(function()
+    return api.nvim_win_get_var(current_win, 'fullscreen_state')
+  end)
+
+  if not success or win_vars == nil then
+    win_vars = { is_fullscreen = false }
+  end
+
+  if win_vars.is_fullscreen then
+    api.nvim_cmd({ cmd = 'wincmd', args = { '=' } }, {})
+    win_vars.is_fullscreen = false
+  else
+    api.nvim_cmd({ cmd = 'wincmd', args = { '_' } }, {}) -- макс. высота
+    api.nvim_cmd({ cmd = 'wincmd', args = { '|' } }, {}) -- макс. ширина
+    win_vars.is_fullscreen = true
+  end
+
+  api.nvim_win_set_var(current_win, 'fullscreen_state', win_vars)
+end
+
+vim.keymap.set('n', '<C-w><C-f>', toggle_fullscreen, { silent = true, desc = 'Toggle fullscreen window' })
+-- vim.keymap.set('t', '<C-w>f', '<cmd>tab split<cr>', { desc = '"Fullscreen" window' })
+-- vim.keymap.set('t', '<C-w><C-f>', function()
+--   vim.api.nvim_feedkeys(
+--     vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true),
+--     'n',
+--     false
+--   )
+--   toggle_fullscreen()
+--   vim.api.nvim_feedkeys(
+--     vim.api.nvim_replace_termcodes('i', true, false, true),
+--     'n',
+--     false
+--   )
+-- end, {
+--   silent = true,
+--   desc = 'Toggle fullscreen in terminal'
+-- })
+
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+
+vim.keymap.set({'t', 'n'}, '<C-\\>', function()
+    -- vim.cmd('RunTerminal')
+    vim.cmd('ToggleProjectTerminal')
+end, { noremap = true, silent = true })
 
 -- Команды
 vim.api.nvim_create_user_command('W', function()

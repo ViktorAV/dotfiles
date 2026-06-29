@@ -32,6 +32,7 @@ export mastery_pid="$HOME/yadisk/code/python/mastery/data/pid"
 
 export XDG_CURRENT_DESKTOP=Hyprland
 export XDG_SESSION_TYPE=wayland
+export PIP_CACHE_DIR="$HOME/.cache/pip"
 
 # История
 HISTFILE=~/.history
@@ -90,10 +91,10 @@ alias e="nvim"
 # alias pyclean='find . \( -type f -name "*.py[co]" -o -type d -name "__pycache__" \) -delete && echo "Removed pycs and __pycache__"'
 alias timestamp='date "+%s"'
 
-# alias tmux_restore='tmux new-session -d -s del && tmux run-shell "~/.config/tmux/plugins/tmux-resurrect/scripts/restore.sh" && tmux kill-session -t del && tmux attach || tmux attach'
-# if [ -z "$TMUX" ]; then
-#   tmux attach || tmux_restore
-# fi
+#alias tmux_restore='tmux new-session -d -s del && tmux run-shell "~/.config/tmux/plugins/tmux-resurrect/scripts/restore.sh" && tmux kill-session -t del && tmux attach || tmux attach'
+#if [ -z "$TMUX" ]; then
+#  tmux attach || tmux_restore
+#fi
 
 eval "$(starship init zsh)"
 

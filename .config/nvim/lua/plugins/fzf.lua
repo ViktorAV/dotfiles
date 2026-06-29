@@ -36,8 +36,10 @@ return {
                 -- sort_last_used = true,
             },
             file_ignore_patterns = {
-                -- '.git',
+                '.git',
                 '__pycache__',
+                '.venv',
+                -- 'src/tasks/python/'
             },
             -- files = {
             --     -- rg_opts = '--sort=path --color=never --files --hidden --follow'
